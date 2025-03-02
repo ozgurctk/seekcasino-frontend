@@ -1,0 +1,57 @@
+.casino-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.casino-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card-header {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 15px;
+}
+
+.casino-logo {
+  max-height: 90px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.rating {
+  margin-bottom: 15px;
+}
+
+.rating-stars {
+  margin-bottom: 5px;
+  color: #ffd700;
+}
+
+.badge {
+  font-weight: 500;
+}
+
+.badge.bg-warning {
+  font-size: 1rem;
+}
+
+.badges .badge {
+  font-size: 0.8rem;
+}
+
+.card-text {
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
