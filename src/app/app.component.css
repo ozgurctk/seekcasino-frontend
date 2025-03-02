@@ -1,0 +1,12 @@
+/* Ana uygulama yapısı için stil */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Router outlet'in içeriği, sayfa yapısının ana kısmını oluşturur */
+router-outlet + * {
+  flex: 1;
+  padding-top: 56px; /* Navbar yüksekliğine göre ayarlanabilir */
+}
