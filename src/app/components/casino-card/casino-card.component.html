@@ -1,0 +1,44 @@
+<div class="card h-100 casino-card shadow-sm">
+  <div class="card-header bg-white">
+    <img [src]="getLogoUrl()" alt="{{ casino.name }} logo" class="casino-logo img-fluid mx-auto d-block">
+  </div>
+  <div class="card-body d-flex flex-column">
+    <h5 class="card-title text-center">{{ casino.name }}</h5>
+    
+    <div class="rating text-center mb-3">
+      <div class="rating-stars">
+        <i *ngFor="let star of ratingStars" class="bi bi-star-fill"></i>
+        <i *ngIf="hasHalfStar" class="bi bi-star-half"></i>
+        <i *ngFor="let star of emptyStars" class="bi bi-star"></i>
+      </div>
+      <div class="rating-value">
+        <span class="badge bg-warning text-dark">{{ casino.point.toFixed(1) }}</span>
+      </div>
+    </div>
+    
+    <p class="card-text small">
+      {{ casino.description.length > 120 ? (casino.description.substring(0, 120) + '...') : casino.description }}
+    </p>
+    
+    <div class="mt-auto">
+      <!-- Lisanslar -->
+      <div class="badges mb-2" *ngIf="topLicences.length > 0">
+        <span class="fw-bold">Lisanslar: </span>
+        <span *ngFor="let licence of topLicences" class="badge bg-light text-dark me-1">{{ licence.name }}</span>
+        <span *ngIf="casino.licences.length > 3" class="badge bg-light text-dark">+{{ casino.licences.length - 3 }} daha</span>
+      </div>
+      
+      <!-- Ödeme Yöntemleri -->
+      <div class="badges mb-2" *ngIf="topPaymentMethods.length > 0">
+        <span class="fw-bold">Ödeme: </span>
+        <span *ngFor="let payment of topPaymentMethods" class="badge bg-light text-dark me-1">{{ payment.name }}</span>
+        <span *ngIf="casino.paymentMethods.length > 3" class="badge bg-light text-dark">+{{ casino.paymentMethods.length - 3 }} daha</span>
+      </div>
+      
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <a [routerLink]="['/casinos', casino.id]" class="btn btn-primary">Detaylar</a>
+        <a href="{{ casino.casinoExternalAddress }}" target="_blank" class="btn btn-accent">Ziyaret Et</a>
+      </div>
+    </div>
+  </div>
+</div>
