@@ -1,22 +1,26 @@
-/* Home component özel stilleri */
-.h3 {
-  color: var(--primary-color);
-  font-weight: 600;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--accent-color);
-  display: inline-block;
+/* Home sayfası için özel stil */
+.active-filters {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 10px 15px;
 }
 
-.pagination {
-  --bs-pagination-active-bg: var(--primary-color);
-  --bs-pagination-active-border-color: var(--primary-color);
-  --bs-pagination-color: var(--primary-color);
-  --bs-pagination-hover-color: var(--secondary-color);
+.active-filters .badge {
+  padding: 6px 10px;
+  font-size: 0.85rem;
 }
 
-/* Responsive düzenlemeler */
+.active-filters .bi-x-circle {
+  cursor: pointer;
+}
+
+.active-filters .bi-x-circle:hover {
+  opacity: 0.8;
+}
+
+/* Responsive stil ayarlamaları */
 @media (max-width: 768px) {
-  .h3 {
-    font-size: 1.5rem;
+  h1 {
+    font-size: 1.75rem;
   }
 }
