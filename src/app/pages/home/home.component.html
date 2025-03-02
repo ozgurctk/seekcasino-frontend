@@ -1,0 +1,58 @@
+<app-header (search)="onSearchChange($event)"></app-header>
+
+<div class="container-fluid py-3 mt-5">
+  <div class="row">
+    <!-- Filtre Sidebar -->
+    <div class="col-md-3 mb-4">
+      <app-filter-sidebar (filterChange)="onFilterChange($event)"></app-filter-sidebar>
+    </div>
+    
+    <!-- Ana içerik -->
+    <div class="col-md-9">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Online Casinolar</h1>
+        <div class="text-muted">
+          {{ totalItems }} casino bulundu
+        </div>
+      </div>
+      
+      <!-- Yükleme durumu -->
+      <div *ngIf="isLoading" class="d-flex justify-content-center my-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Yükleniyor...</span>
+        </div>
+      </div>
+      
+      <!-- Hata mesajı -->
+      <div *ngIf="error" class="alert alert-danger">
+        {{ error }}
+      </div>
+      
+      <!-- Casino listesi -->
+      <div *ngIf="!isLoading && !error && casinos.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div *ngFor="let casino of casinos" class="col">
+          <app-casino-card [casino]="casino"></app-casino-card>
+        </div>
+      </div>
+      
+      <!-- Veri yoksa -->
+      <div *ngIf="!isLoading && !error && casinos.length === 0" class="alert alert-info">
+        Arama kriterlerinize uygun casino bulunamadı.
+      </div>
+      
+      <!-- Sayfalama -->
+      <div *ngIf="!isLoading && totalItems > pageSize" class="d-flex justify-content-center mt-4">
+        <ngb-pagination
+          [collectionSize]="totalItems"
+          [(page)]="currentPage"
+          [pageSize]="pageSize"
+          [maxSize]="5"
+          [boundaryLinks]="true"
+          (pageChange)="onPageChange($event)"
+        ></ngb-pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
