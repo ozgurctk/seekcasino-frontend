@@ -1,0 +1,250 @@
+<div class="filter-sidebar p-3 bg-light rounded-3">
+  <h5 class="mb-4">Filtreleme Seçenekleri</h5>
+  
+  <!-- Lisanslar -->
+  <div class="filter-group mb-4">
+    <label class="form-label fw-bold">Lisanslar</label>
+    
+    <div class="input-group mb-2">
+      <input 
+        type="text" 
+        class="form-control form-control-sm" 
+        placeholder="Lisans ara..." 
+        [(ngModel)]="licenceFilter"
+      >
+      <button 
+        *ngIf="licenceFilter" 
+        class="btn btn-sm btn-outline-secondary" 
+        type="button"
+        (click)="licenceFilter = ''"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="filter-options">
+      <div class="form-check" *ngFor="let licence of filteredLicences">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          [id]="'licence-' + licence.id" 
+          name="licenceGroup"
+          [checked]="selectedLicenceId === licence.id"
+          (change)="onLicenceChange(licence.id)"
+        >
+        <label class="form-check-label" [for]="'licence-' + licence.id">{{ licence.name }}</label>
+      </div>
+      
+      <div class="form-check" *ngIf="selectedLicenceId">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          id="licence-none" 
+          name="licenceGroup"
+          [checked]="!selectedLicenceId"
+          (change)="onLicenceChange(null)"
+        >
+        <label class="form-check-label" for="licence-none">Hepsi</label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Sağlayıcılar -->
+  <div class="filter-group mb-4">
+    <label class="form-label fw-bold">Sağlayıcılar</label>
+    
+    <div class="input-group mb-2">
+      <input 
+        type="text" 
+        class="form-control form-control-sm" 
+        placeholder="Sağlayıcı ara..." 
+        [(ngModel)]="providerFilter"
+      >
+      <button 
+        *ngIf="providerFilter" 
+        class="btn btn-sm btn-outline-secondary" 
+        type="button"
+        (click)="providerFilter = ''"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="filter-options">
+      <div class="form-check" *ngFor="let provider of filteredProviders">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          [id]="'provider-' + provider.id" 
+          name="providerGroup"
+          [checked]="selectedProviderId === provider.id"
+          (change)="onProviderChange(provider.id)"
+        >
+        <label class="form-check-label" [for]="'provider-' + provider.id">{{ provider.name }}</label>
+      </div>
+      
+      <div class="form-check" *ngIf="selectedProviderId">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          id="provider-none" 
+          name="providerGroup"
+          [checked]="!selectedProviderId"
+          (change)="onProviderChange(null)"
+        >
+        <label class="form-check-label" for="provider-none">Hepsi</label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Oyun Türleri -->
+  <div class="filter-group mb-4">
+    <label class="form-label fw-bold">Oyun Türleri</label>
+    
+    <div class="input-group mb-2">
+      <input 
+        type="text" 
+        class="form-control form-control-sm" 
+        placeholder="Oyun türü ara..." 
+        [(ngModel)]="gameTypeFilter"
+      >
+      <button 
+        *ngIf="gameTypeFilter" 
+        class="btn btn-sm btn-outline-secondary" 
+        type="button"
+        (click)="gameTypeFilter = ''"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="filter-options">
+      <div class="form-check" *ngFor="let gameType of filteredGameTypes">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          [id]="'gameType-' + gameType.id" 
+          name="gameTypeGroup"
+          [checked]="selectedGameTypeId === gameType.id"
+          (change)="onGameTypeChange(gameType.id)"
+        >
+        <label class="form-check-label" [for]="'gameType-' + gameType.id">{{ gameType.name }}</label>
+      </div>
+      
+      <div class="form-check" *ngIf="selectedGameTypeId">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          id="gameType-none" 
+          name="gameTypeGroup"
+          [checked]="!selectedGameTypeId"
+          (change)="onGameTypeChange(null)"
+        >
+        <label class="form-check-label" for="gameType-none">Hepsi</label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Diller -->
+  <div class="filter-group mb-4">
+    <label class="form-label fw-bold">Diller</label>
+    
+    <div class="input-group mb-2">
+      <input 
+        type="text" 
+        class="form-control form-control-sm" 
+        placeholder="Dil ara..." 
+        [(ngModel)]="languageFilter"
+      >
+      <button 
+        *ngIf="languageFilter" 
+        class="btn btn-sm btn-outline-secondary" 
+        type="button"
+        (click)="languageFilter = ''"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="filter-options">
+      <div class="form-check" *ngFor="let language of filteredLanguages">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          [id]="'language-' + language.id" 
+          name="languageGroup"
+          [checked]="selectedLanguageId === language.id"
+          (change)="onLanguageChange(language.id)"
+        >
+        <label class="form-check-label" [for]="'language-' + language.id">{{ language.name }}</label>
+      </div>
+      
+      <div class="form-check" *ngIf="selectedLanguageId">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          id="language-none" 
+          name="languageGroup"
+          [checked]="!selectedLanguageId"
+          (change)="onLanguageChange(null)"
+        >
+        <label class="form-check-label" for="language-none">Hepsi</label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Ödeme Yöntemleri -->
+  <div class="filter-group mb-4">
+    <label class="form-label fw-bold">Ödeme Yöntemleri</label>
+    
+    <div class="input-group mb-2">
+      <input 
+        type="text" 
+        class="form-control form-control-sm" 
+        placeholder="Ödeme yöntemi ara..." 
+        [(ngModel)]="paymentMethodFilter"
+      >
+      <button 
+        *ngIf="paymentMethodFilter" 
+        class="btn btn-sm btn-outline-secondary" 
+        type="button"
+        (click)="paymentMethodFilter = ''"
+      >
+        <i class="bi bi-x"></i>
+      </button>
+    </div>
+    
+    <div class="filter-options">
+      <div class="form-check" *ngFor="let paymentMethod of filteredPaymentMethods">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          [id]="'paymentMethod-' + paymentMethod.id" 
+          name="paymentMethodGroup"
+          [checked]="selectedPaymentMethodId === paymentMethod.id"
+          (change)="onPaymentMethodChange(paymentMethod.id)"
+        >
+        <label class="form-check-label" [for]="'paymentMethod-' + paymentMethod.id">{{ paymentMethod.name }}</label>
+      </div>
+      
+      <div class="form-check" *ngIf="selectedPaymentMethodId">
+        <input 
+          class="form-check-input" 
+          type="radio" 
+          id="paymentMethod-none" 
+          name="paymentMethodGroup"
+          [checked]="!selectedPaymentMethodId"
+          (change)="onPaymentMethodChange(null)"
+        >
+        <label class="form-check-label" for="paymentMethod-none">Hepsi</label>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Filtreleri Temizle Butonları -->
+  <div class="d-grid gap-2" *ngIf="selectedLicenceId || selectedProviderId || selectedGameTypeId || selectedLanguageId || selectedPaymentMethodId">
+    <button class="btn btn-outline-secondary" (click)="onLicenceChange(null); onProviderChange(null); onGameTypeChange(null); onLanguageChange(null); onPaymentMethodChange(null);">
+      <i class="bi bi-x-circle me-2"></i>Tüm Filtreleri Temizle
+    </button>
+  </div>
+</div>
