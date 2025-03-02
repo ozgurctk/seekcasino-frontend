@@ -1,52 +1,117 @@
-<app-header (search)="onSearchChange($event)"></app-header>
+<app-header></app-header>
 
-<div class="container-fluid py-3 mt-5">
+<div class="container-fluid py-4">
   <div class="row">
-    <!-- Filtre Sidebar -->
+    <!-- Filtreleme Sidebar -->
     <div class="col-md-3 mb-4">
-      <app-filter-sidebar (filterChange)="onFilterChange($event)"></app-filter-sidebar>
+      <app-filter-sidebar
+        [licences]="licences"
+        [providers]="providers"
+        [gameTypes]="gameTypes" 
+        [languages]="languages"
+        [paymentMethods]="paymentMethods"
+        [selectedLicenceId]="filter.licenceId"
+        [selectedProviderId]="filter.providerId"
+        [selectedGameTypeId]="filter.gameTypeId"
+        [selectedLanguageId]="filter.languageId"
+        [selectedPaymentMethodId]="filter.paymentMethodId"
+        (licenceChanged)="onLicenceFilter($event)"
+        (providerChanged)="onProviderFilter($event)"
+        (gameTypeChanged)="onGameTypeFilter($event)"
+        (languageChanged)="onLanguageFilter($event)"
+        (paymentMethodChanged)="onPaymentMethodFilter($event)"
+      ></app-filter-sidebar>
     </div>
-    
-    <!-- Ana içerik -->
+
+    <!-- Casino Listesi -->
     <div class="col-md-9">
+      <!-- Arama ve Başlık -->
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3">Online Casinolar</h1>
-        <div class="text-muted">
-          {{ totalItems }} casino bulundu
+        <h1>Casino Listesi</h1>
+        
+        <div class="input-group" style="max-width: 300px;">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Casino ara..."
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+          >
+          <button class="btn btn-primary" (click)="onSearch()">
+            <i class="bi bi-search"></i>
+          </button>
         </div>
       </div>
-      
-      <!-- Yükleme durumu -->
-      <div *ngIf="isLoading" class="d-flex justify-content-center my-5">
+
+      <!-- Uygulanan Filtreler Gösterimi -->
+      <div *ngIf="filter.licenceId || filter.providerId || filter.gameTypeId || filter.languageId || filter.paymentMethodId || filter.searchTerm" 
+           class="active-filters mb-3 p-2 bg-light rounded">
+        <span class="fw-bold me-2">Aktif Filtreler:</span>
+        
+        <span *ngIf="filter.searchTerm" class="badge bg-primary me-2">
+          Arama: "{{ filter.searchTerm }}"
+          <i class="bi bi-x-circle ms-1" role="button" (click)="resetFilter(); loadCasinos()"></i>
+        </span>
+        
+        <span *ngIf="filter.licenceId" class="badge bg-primary me-2">
+          Lisans: {{ licences.find(l => l.id === filter.licenceId)?.name }}
+          <i class="bi bi-x-circle ms-1" role="button" (click)="resetFilter(); loadCasinos()"></i>
+        </span>
+        
+        <span *ngIf="filter.providerId" class="badge bg-primary me-2">
+          Sağlayıcı: {{ providers.find(p => p.id === filter.providerId)?.name }}
+          <i class="bi bi-x-circle ms-1" role="button" (click)="resetFilter(); loadCasinos()"></i>
+        </span>
+        
+        <span *ngIf="filter.gameTypeId" class="badge bg-primary me-2">
+          Oyun Türü: {{ gameTypes.find(g => g.id === filter.gameTypeId)?.name }}
+          <i class="bi bi-x-circle ms-1" role="button" (click)="resetFilter(); loadCasinos()"></i>
+        </span>
+        
+        <span *ngIf="filter.languageId" class="badge bg-primary me-2">
+          Dil: {{ languages.find(l => l.id === filter.languageId)?.name }}
+          <i class="bi bi-x-circle ms-1" role="button" (click)="resetFilter(); loadCasinos()"></i>
+        </span>
+        
+        <span *ngIf="filter.paymentMethodId" class="badge bg-primary me-2">
+          Ödeme Yöntemi: {{ paymentMethods.find(p => p.id === filter.paymentMethodId)?.name }}
+          <i class="bi bi-x-circle ms-1" role="button" (click)="resetFilter(); loadCasinos()"></i>
+        </span>
+      </div>
+
+      <!-- Yükleniyor Göstergesi -->
+      <div *ngIf="isLoading" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Yükleniyor...</span>
         </div>
+        <p class="mt-2">Casinolar yükleniyor...</p>
       </div>
-      
-      <!-- Hata mesajı -->
+
+      <!-- Hata Mesajı -->
       <div *ngIf="error" class="alert alert-danger">
         {{ error }}
       </div>
-      
-      <!-- Casino listesi -->
+
+      <!-- Veri Yok Mesajı -->
+      <div *ngIf="!isLoading && !error && casinos.length === 0" class="alert alert-info">
+        Belirtilen kriterlere uygun casino bulunamadı.
+      </div>
+
+      <!-- Casino Kartları Grid Sistemi -->
       <div *ngIf="!isLoading && !error && casinos.length > 0" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         <div *ngFor="let casino of casinos" class="col">
           <app-casino-card [casino]="casino"></app-casino-card>
         </div>
       </div>
-      
-      <!-- Veri yoksa -->
-      <div *ngIf="!isLoading && !error && casinos.length === 0" class="alert alert-info">
-        Arama kriterlerinize uygun casino bulunamadı.
-      </div>
-      
+
       <!-- Sayfalama -->
-      <div *ngIf="!isLoading && totalItems > pageSize" class="d-flex justify-content-center mt-4">
+      <div *ngIf="pageCount > 1 && !isLoading" class="d-flex justify-content-center mt-4">
         <ngb-pagination
-          [collectionSize]="totalItems"
-          [(page)]="currentPage"
-          [pageSize]="pageSize"
+          [collectionSize]="totalCount"
+          [(page)]="filter.pageNumber!"
+          [pageSize]="filter.pageSize!"
           [maxSize]="5"
+          [rotate]="true"
           [boundaryLinks]="true"
           (pageChange)="onPageChange($event)"
         ></ngb-pagination>
