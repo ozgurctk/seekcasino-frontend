@@ -1,0 +1,49 @@
+.footer {
+  background: linear-gradient(135deg, #212529, #343a40) !important;
+}
+
+.footer h5, .footer h6 {
+  font-weight: 600;
+}
+
+.footer h5 {
+  color: var(--accent-color);
+}
+
+.footer h6 {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+}
+
+.footer .list-unstyled li {
+  padding: 0.3rem 0;
+}
+
+.footer a {
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: var(--accent-color) !important;
+}
+
+.social-links a {
+  font-size: 1.3rem;
+  margin-right: 0.5rem;
+  transition: transform 0.3s ease;
+  display: inline-block;
+}
+
+.social-links a:hover {
+  transform: translateY(-3px);
+}
+
+hr {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.text-muted {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
