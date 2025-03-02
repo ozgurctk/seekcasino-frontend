@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import { Casino, CasinoFilter, GameType, Language, Licence, PaymentMethod, Provider } from '../../models/casino.model';
 import { CasinoService } from '../../services/casino.service';
-import { Casino, CasinoFilter, CasinoListResponse, GameType, Language, Licence, PaymentMethod, Provider } from '../../models/casino.model';
-import { FooterComponent } from '../../shared/footer/footer.component';
-import { HeaderComponent } from '../../shared/header/header.component';
-import { CasinoCardComponent } from '../../shared/casino-card/casino-card.component';
-import { FilterSidebarComponent } from '../../shared/filter-sidebar/filter-sidebar.component';
+import { CasinoCardComponent } from '../../components/casino-card/casino-card.component';
+import { HeaderComponent } from '../../components/header/header.component';
+import { FooterComponent } from '../../components/footer/footer.component';
+import { FilterSidebarComponent } from '../../components/filter-sidebar/filter-sidebar.component';
 
 @Component({
   selector: 'app-home',
@@ -18,9 +18,9 @@ import { FilterSidebarComponent } from '../../shared/filter-sidebar/filter-sideb
     FormsModule,
     RouterModule,
     NgbPaginationModule,
+    CasinoCardComponent,
     HeaderComponent,
     FooterComponent,
-    CasinoCardComponent,
     FilterSidebarComponent
   ],
   templateUrl: './home.component.html',
@@ -33,16 +33,21 @@ export class HomeComponent implements OnInit {
   isLoading = true;
   error: string | null = null;
   
-  // Filtre seçenekleri
+  // Filtreleme ve Sayfalama için
   filter: CasinoFilter = {
-    pageSize: 9,
+    pageSize: 12,
     pageNumber: 1
   };
+  totalCount = 0;
+  pageCount = 0;
   
-  // Sayfalama bilgileri
-  totalItems = 0;
-  currentPage = 1;
-  pageSize = 9;
+  // Filtre seçenekleri
+  searchTerm = '';
+  licences: Licence[] = [];
+  providers: Provider[] = [];
+  gameTypes: GameType[] = [];
+  languages: Language[] = [];
+  paymentMethods: PaymentMethod[] = [];
   
   ngOnInit(): void {
     this.loadCasinos();
@@ -53,16 +58,19 @@ export class HomeComponent implements OnInit {
     this.error = null;
     
     this.casinoService.getCasinos(this.filter).subscribe({
-      next: (response: CasinoListResponse) => {
+      next: (response) => {
         this.casinos = response.casinos;
-        this.totalItems = response.pagination.totalCount;
-        this.currentPage = response.pagination.currentPage;
-        this.pageSize = response.pagination.pageSize;
+        this.totalCount = response.pagination.totalCount;
+        this.pageCount = response.pagination.pageCount;
+        
+        // Filtreleme seçeneklerini oluştur
+        this.collectFilterOptions();
+        
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Casino verilerini getirirken hata oluştu:', err);
-        this.error = 'Casino verileri yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.';
+        console.error('Casino verileri yüklenirken hata oluştu', err);
+        this.error = 'Casino verileri yüklenirken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.';
         this.isLoading = false;
       }
     });
@@ -71,22 +79,128 @@ export class HomeComponent implements OnInit {
   onPageChange(page: number): void {
     this.filter.pageNumber = page;
     this.loadCasinos();
-    // Sayfa değiştiğinde sayfanın en üstüne git
+    // Sayfa değiştiğinde ekranın üstüne dön
     window.scrollTo(0, 0);
   }
   
-  onFilterChange(newFilter: CasinoFilter): void {
-    // Yeni sayfaya geçtiğimizde sayfa numarasını 1'e sıfırla
-    this.filter = { ...newFilter, pageNumber: 1 };
+  onSearch(): void {
+    if (this.searchTerm?.trim()) {
+      this.filter = {
+        ...this.filter,
+        pageNumber: 1,
+        searchTerm: this.searchTerm.trim(),
+        licenceId: undefined,
+        providerId: undefined,
+        gameTypeId: undefined,
+        languageId: undefined,
+        paymentMethodId: undefined
+      };
+    } else {
+      this.filter = {
+        ...this.filter,
+        pageNumber: 1,
+        searchTerm: undefined
+      };
+    }
+    
     this.loadCasinos();
   }
   
-  onSearchChange(searchTerm: string): void {
-    this.filter = { 
-      ...this.filter, 
-      searchTerm: searchTerm || undefined,
-      pageNumber: 1
-    };
+  onLicenceFilter(licenceId: string | null): void {
+    this.resetFilter();
+    this.filter.licenceId = licenceId || undefined;
     this.loadCasinos();
+  }
+  
+  onProviderFilter(providerId: string | null): void {
+    this.resetFilter();
+    this.filter.providerId = providerId || undefined;
+    this.loadCasinos();
+  }
+  
+  onGameTypeFilter(gameTypeId: string | null): void {
+    this.resetFilter();
+    this.filter.gameTypeId = gameTypeId || undefined;
+    this.loadCasinos();
+  }
+  
+  onLanguageFilter(languageId: string | null): void {
+    this.resetFilter();
+    this.filter.languageId = languageId || undefined;
+    this.loadCasinos();
+  }
+  
+  onPaymentMethodFilter(paymentMethodId: string | null): void {
+    this.resetFilter();
+    this.filter.paymentMethodId = paymentMethodId || undefined;
+    this.loadCasinos();
+  }
+  
+  resetFilter(): void {
+    this.searchTerm = '';
+    this.filter = {
+      pageSize: this.filter.pageSize,
+      pageNumber: 1,
+      searchTerm: undefined,
+      licenceId: undefined,
+      providerId: undefined,
+      gameTypeId: undefined,
+      languageId: undefined,
+      paymentMethodId: undefined
+    };
+  }
+  
+  // Filtreleme seçeneklerini (lisans, ödeme yöntemleri vs) güncel casino listesinden topla
+  private collectFilterOptions(): void {
+    // Bu fonksiyon, gelen casino verileri üzerinden filtre seçeneklerini toplar
+    const licencesMap = new Map<string, Licence>();
+    const providersMap = new Map<string, Provider>();
+    const gameTypesMap = new Map<string, GameType>();
+    const languagesMap = new Map<string, Language>();
+    const paymentMethodsMap = new Map<string, PaymentMethod>();
+    
+    this.casinos.forEach(casino => {
+      // Lisanslar
+      casino.licences.forEach(licence => {
+        if (!licencesMap.has(licence.id)) {
+          licencesMap.set(licence.id, licence);
+        }
+      });
+      
+      // Sağlayıcılar
+      casino.providers.forEach(provider => {
+        if (!providersMap.has(provider.id)) {
+          providersMap.set(provider.id, provider);
+        }
+      });
+      
+      // Oyun Türleri
+      casino.gameTypes.forEach(gameType => {
+        if (!gameTypesMap.has(gameType.id)) {
+          gameTypesMap.set(gameType.id, gameType);
+        }
+      });
+      
+      // Diller
+      casino.languages.forEach(language => {
+        if (!languagesMap.has(language.id)) {
+          languagesMap.set(language.id, language);
+        }
+      });
+      
+      // Ödeme Yöntemleri
+      casino.paymentMethods.forEach(paymentMethod => {
+        if (!paymentMethodsMap.has(paymentMethod.id)) {
+          paymentMethodsMap.set(paymentMethod.id, paymentMethod);
+        }
+      });
+    });
+    
+    // Map'lerden dizilere çevir
+    this.licences = Array.from(licencesMap.values());
+    this.providers = Array.from(providersMap.values());
+    this.gameTypes = Array.from(gameTypesMap.values());
+    this.languages = Array.from(languagesMap.values());
+    this.paymentMethods = Array.from(paymentMethodsMap.values());
   }
 }
